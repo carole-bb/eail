@@ -5,6 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>אלטרואיזם אפקטיבי ישראל</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: right;
+        }
+        header {
+            background: linear-gradient(135deg, #002855, #005599);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        nav {
+            background: #005599;
+            padding: 15px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 20px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #ffcc00;
+        }
+        .hero {
+            background-image: url('https://source.unsplash.com/1600x900/?technology,future');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            font-weight: bold;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        .gallery {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .gallery img {
+            width: 300px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .gallery img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        .interactive-button {
+            display: block;
+            width: 250px;
+            margin: 30px auto;
+            padding: 15px;
+            text-align: center;
+            background: #ffcc00;
+            color: black;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .interactive-button:hover {
+            background: #ffaa00;
+            transform: scale(1.05);
+        }
+        footer {
+            background: #002855;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -17,9 +118,26 @@
         <a href="#">מי אנחנו</a>
         <a href="#">צור קשר</a>
     </nav>
+    <div class="hero">
+        <h2>ביחד, יוצרים עתיד טוב יותר</h2>
+    </div>
     <div class="container">
         <h2>ברוכים הבאים לאלטרואיזם אפקטיבי ישראל</h2>
-        <p>אנו מחויבים ליצירת אימפקט חיובי ומדיד באמצעות החלטות מבוססות נתונים.</p>
+        <p>אנו מחויבים ליצירת שינוי חיובי ומדיד בעולם באמצעות החלטות מבוססות נתונים ושימוש במשאבים באופן היעיל ביותר.</p>
+        <h3>מה אנחנו עושים?</h3>
+        <ul>
+            <li>אירועי חשיפה</li>
+            <li>ייעוץ קריירה</li>
+            <li>ניהול פרויקטים אפקטיביים</li>
+        </ul>
+        <h3>גלריית תמונות</h3>
+        <div class="gallery">
+            <img src="https://source.unsplash.com/300x180/?team" alt="Community">
+            <img src="https://source.unsplash.com/300x180/?innovation" alt="Innovation">
+            <img src="https://source.unsplash.com/300x180/?education" alt="Education">
+            <img src="https://source.unsplash.com/300x180/?collaboration" alt="Collaboration">
+        </div>
+        <div class="interactive-button">לחץ כאן ללמוד עוד</div>
     </div>
     <footer>
         <p>כל הזכויות שמורות © 2025</p>
