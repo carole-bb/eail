@@ -1,32 +1,38 @@
-body {
-    font-family: Arial, sans-serif;
-    direction: rtl;
-    text-align: right;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-}
-header, footer {
-    background: #003366;
-    color: white;
-    text-align: center;
-    padding: 15px;
-}
-nav {
-    background: #005599;
-    padding: 10px;
-    text-align: center;
-}
-nav a {
-    color: white;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 18px;
-}
-.container {
-    width: 80%;
-    margin: 20px auto;
-    background: white;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+</head>
+<body>
+    <header>
+        <h1>אלטרואיזם אפקטיבי ישראל</h1>
+    </header>
+    <nav>
+        <a href="#">בית</a>
+        <a href="#">בלוג</a>
+        <a href="#">פרויקטים</a>
+        <a href="#">מי אנחנו</a>
+        <a href="#">צור קשר</a>
+    </nav>
+    <div class="hero">
+        <h2>ביחד, יוצרים עתיד טוב יותר</h2>
+    </div>
+    <div class="container">
+        <h2>ברוכים הבאים לאלטרואיזם אפקטיבי ישראל</h2>
+        <p>אנו מחויבים ליצירת שינוי חיובי ומדיד בעולם באמצעות החלטות מבוססות נתונים ושימוש במשאבים באופן היעיל ביותר.</p>
+        <h3>מה אנחנו עושים?</h3>
+        <ul>
+            <li>אירועי חשיפה</li>
+            <li>ייעוץ קריירה</li>
+            <li>ניהול פרויקטים אפקטיביים</li>
+        </ul>
+        <h3>גלריית תמונות</h3>
+        <div class="gallery">
+            <img src="https://source.unsplash.com/300x180/?team" alt="Community">
+            <img src="https://source.unsplash.com/300x180/?innovation" alt="Innovation">
+            <img src="https://source.unsplash.com/300x180/?education" alt="Education">
+            <img src="https://source.unsplash.com/300x180/?collaboration" alt="Collaboration">
+        </div>
+        <div class="interactive-button">לחץ כאן ללמוד עוד</div>
+    </div>
+    <footer>
+        <p>כל הזכויות שמורות © 2025</p>
+    </footer>
+</body>
+</html>
