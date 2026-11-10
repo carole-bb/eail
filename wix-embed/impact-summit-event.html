@@ -114,7 +114,17 @@ p+p{margin-top:.9em}
 .soon{display:inline-flex;align-items:center;gap:.6em;background:#fff;padding:.5em 1em;font-weight:700}
 .dot{width:.8em;height:.8em;border-radius:50%;background:var(--coral);animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,88,62,.55)}60%{box-shadow:0 0 0 .7em rgba(244,88,62,0)}}
-.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(24px,4vw,48px)}
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:clamp(18px,2.6vw,28px);margin-bottom:1.4em}
+.people:empty,.orgs:empty{display:none}
+.person{background:#fff;box-shadow:-8px 8px 0 var(--blue)}
+.person:nth-child(4n+2){box-shadow:-8px 8px 0 var(--coral)} .person:nth-child(4n+3){box-shadow:-8px 8px 0 var(--navy)} .person:nth-child(4n+4){box-shadow:-8px 8px 0 var(--peach)}
+.person .ph{aspect-ratio:1;background:var(--sky) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:56px;color:var(--navy)}
+.person .nm{font-weight:900;font-size:1.05em;line-height:1.25;padding:.6em .75em 0}
+.person .rl{font-size:.88em;line-height:1.4;padding:.2em .85em .8em}
+.orgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:var(--gap);margin-bottom:1.4em}
+.org{background:#fff;min-height:96px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;line-height:1.25;color:var(--navy);text-decoration:none;border-bottom:6px solid var(--blue)}
+.org:nth-child(4n+2){border-color:var(--coral)} .org:nth-child(4n+3){border-color:var(--navy)} .org:nth-child(4n+4){border-color:var(--peach)}
+.org img{max-width:100%;max-height:64px;object-fit:contain}
 
 @media (prefers-reduced-motion:reduce){.strip i{transform:none;transition:none}.rv{opacity:1;transform:none;transition:none}.dot{animation:none}}
 </style>
@@ -234,22 +244,61 @@ p+p{margin-top:.9em}
 </section>
 
 <section style="padding-top:0">
-  <div class="wrap two">
-    <div>
-      <h2 class="rv">דוברים ודוברות</h2>
-      <div class="soon rv"><span class="dot"></span>מתעדכן מידי שבוע</div>
-    </div>
-    <div>
-      <h2 class="rv">הארגונים שתפגשו בכנס</h2>
-      <div class="soon rv"><span class="dot"></span>מתעדכן מידי שבוע</div>
-    </div>
+  <div class="wrap">
+    <h2 class="rv">דוברים ודוברות</h2>
+    <div class="people" id="speakers"></div>
+    <div class="soon rv"><span class="dot"></span>מתעדכן מידי שבוע</div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <h2 class="rv">הארגונים שתפגשו בכנס</h2>
+    <div class="orgs" id="orgs"></div>
+    <div class="soon rv"><span class="dot"></span>מתעדכן מידי שבוע</div>
   </div>
 </section>
 
 <div class="foot"><canvas data-cubes="skyline" data-seed="5" data-max="5" aria-hidden="true"></canvas></div>
 
 <script>
+/* ======================================================================
+   EDIT HERE — speakers and organizations.
+   Add one line per person / organization, separated by commas.
+   photo / logo / url are optional; leave them as '' if you don't have one.
+   Photos and logos must be web addresses (e.g. copied from the Wix Media Manager).
+
+   Example:
+   var SPEAKERS = [
+     { name: 'שם מלא', role: 'תפקיד, ארגון', photo: 'https://static.wixstatic.com/media/....jpg' },
+     { name: 'שם נוסף', role: 'תפקיד, ארגון', photo: '' }
+   ];
+   var ORGS = [
+     { name: 'שם הארגון', logo: 'https://static.wixstatic.com/media/....png', url: 'https://example.org' }
+   ];
+   ====================================================================== */
+var SPEAKERS = [
+];
+var ORGS = [
+];
+
 (function(){
+  /* ---- build the speaker and organization cards from the lists above ---- */
+  function el(tag,cls,txt){ var e=document.createElement(tag); e.className=cls; if(txt) e.textContent=txt; return e; }
+  SPEAKERS.forEach(function(sp,n){
+    var c=el('div','person rv'), ph=el('div','ph'); c.style.setProperty('--i',n%4);
+    if(sp.photo){ ph.style.backgroundImage='url("'+encodeURI(sp.photo)+'")'; ph.setAttribute('role','img'); ph.setAttribute('aria-label',sp.name||''); }
+    else ph.textContent=(sp.name||'').trim().charAt(0);
+    c.appendChild(ph); c.appendChild(el('div','nm',sp.name)); if(sp.role) c.appendChild(el('div','rl',sp.role));
+    document.getElementById('speakers').appendChild(c);
+  });
+  ORGS.forEach(function(o,n){
+    var c=el(o.url?'a':'div','org rv'); c.style.setProperty('--i',n%6);
+    if(o.url){ c.href=o.url; c.target='_blank'; c.rel='noopener'; }
+    if(o.logo){ var im=new Image(); im.src=o.logo; im.alt=o.name||''; c.appendChild(im); } else c.textContent=o.name||'';
+    document.getElementById('orgs').appendChild(c);
+  });
+
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---- countdown to 29.01.2027, 09:00 Israel time ---- */
