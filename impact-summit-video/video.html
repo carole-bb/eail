@@ -1,0 +1,103 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts.css">
+<style>
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#fbf3ea}
+#bg,#cubes,#grain{position:absolute;left:0;top:0}
+.t{position:absolute;left:120px;white-space:nowrap;color:#2a0e5c;will-change:transform,opacity}
+.kicker{font:400 64px 'Bebas Neue';letter-spacing:6px}
+.bar{position:absolute;left:120px;height:8px;background:#f4583e}
+.big{font:400 190px Anton;transform-origin:left bottom;text-transform:uppercase;line-height:1}
+.coral{color:#f4583e}
+.tag{font:600 50px Raleway}
+.meta{font:400 54px 'Bebas Neue';letter-spacing:5px}
+.org{font:700 40px Raleway}.org span{font-weight:500}
+.line{font:400 132px Anton;text-transform:uppercase;line-height:1}
+</style></head><body>
+<canvas id="bg" width="1920" height="1080"></canvas>
+<canvas id="cubes" width="1920" height="1080"></canvas>
+<div id="txt"></div>
+<canvas id="grain" width="1920" height="1080"></canvas>
+<script>
+const CFG = Object.assign({ date: 'January 2027', city: 'Tel-Aviv', dur: 10 }, window.CFG || {});
+const W=1920,H=1080, ease=x=>1-Math.pow(1-Math.min(1,Math.max(0,x)),3);
+const back=x=>{x=Math.min(1,Math.max(0,x));const c=1.70158;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+let seed=7; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+
+// ---------- background ----------
+const bg=document.getElementById('bg').getContext('2d');
+function drawBg(t){
+  const g=bg.createLinearGradient(0,0,W,H); g.addColorStop(0,'#fdf6ee'); g.addColorStop(.55,'#eef0f8'); g.addColorStop(1,'#cfe2f3');
+  bg.fillStyle=g; bg.fillRect(0,0,W,H);
+  const sy=470-ease(t/CFG.dur)*90, s=bg.createRadialGradient(1500,sy,40,1500,sy,330);
+  s.addColorStop(0,'rgba(255,214,170,.95)'); s.addColorStop(.8,'rgba(250,170,140,.55)'); s.addColorStop(1,'rgba(250,170,140,0)');
+  bg.fillStyle=s; bg.beginPath(); bg.arc(1500,sy,330,0,7); bg.fill();
+}
+// ---------- stacking cubes ----------
+const PAL=[
+  {top:['#d8ebf8','#b5d6ee'],l:['#4f8fd2','#2f6db8'],r:['#27589f','#163a78']},
+  {top:['#ffd9c8','#f9b9a2'],l:['#f77a5e','#ee5438'],r:['#d8452f','#b33324']},
+  {top:['#fffaf2','#f8e6d6'],l:['#f3dccb','#e6c0ad'],r:['#dcb09e','#c79584']},
+  {top:['#8f9bd6','#6a78c2'],l:['#3a348c','#2a1f6c'],r:['#21154f','#150c38']},
+  {top:['#eaf4fb','#cfe4f3'],l:['#8dbbe2','#5f9ad0'],r:['#4a7fbd','#2d5c9c']}];
+const A=96,B=55,HH=110,OX=1560,OY=520, cubes=[];
+for(let i=0;i<=11;i++)for(let j=0;j<=11;j++){
+  if(i+j<3||i+j>13)continue;
+  const h=Math.min(7,Math.floor((i-j+4)*.85+rnd()*1.6)); if(h<=0)continue;
+  const p=PAL[Math.floor(rnd()*PAL.length)];
+  for(let k=0;k<h;k++)cubes.push({i,j,k,p:rnd()<.3?PAL[Math.floor(rnd()*PAL.length)]:p,o:k*3+rnd()*4+(11-i+j)*.25});
+}
+cubes.sort((a,b)=>a.o-b.o).forEach((c,n)=>c.n=n/cubes.length);
+const draw=[...cubes].sort((a,b)=>(a.i+a.j)-(b.i+b.j)||a.k-b.k);
+const cx=document.getElementById('cubes').getContext('2d');
+function face(pts,cols,y0,y1){const g=cx.createLinearGradient(0,y0,0,y1);g.addColorStop(0,cols[0]);g.addColorStop(1,cols[1]);
+  cx.fillStyle=g;cx.beginPath();pts.forEach((p,n)=>n?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.closePath();cx.fill();}
+// progress(t): share of cubes that have started dropping at time t
+function drawCubes(t,progress){
+  cx.clearRect(0,0,W,H);
+  for(const c of draw){
+    const t0=progress.inv(c.n); if(t<t0)continue;
+    const q=(t-t0)/.55, e=back(q), x=OX+(c.i-c.j)*A, y=OY+(c.i+c.j)*B-c.k*HH-(1-e)*520;
+    cx.globalAlpha=Math.min(1,q*3);
+    face([[x,y-HH],[x+A,y-HH+B],[x,y-HH+2*B],[x-A,y-HH+B]],c.p.top,y-HH,y-HH+2*B);
+    face([[x-A,y-HH+B],[x,y-HH+2*B],[x,y+2*B],[x-A,y+B]],c.p.l,y-HH+B,y+2*B);
+    face([[x+A,y-HH+B],[x,y-HH+2*B],[x,y+2*B],[x+A,y+B]],c.p.r,y-HH+B,y+2*B);
+  }
+  cx.globalAlpha=1;
+}
+// ---------- grain ----------
+{const g=document.getElementById('grain').getContext('2d'),im=g.createImageData(W,H);
+ for(let n=0;n<im.data.length;n+=4){const v=rnd()*255;im.data[n]=im.data[n+1]=im.data[n+2]=v;im.data[n+3]=16}
+ g.putImageData(im,0,0);}
+// ---------- text ----------
+const T=document.getElementById('txt'), els=[];
+function add(cls,html,top,tin,tout,opt={}){const d=document.createElement('div');d.className=cls;d.innerHTML=html;d.style.top=top+'px';T.appendChild(d);
+  els.push({d,tin,tout,opt});return d;}
+// scene 1
+add('t line','The world’s hardest problems',330,.4,3.6);
+add('t line coral','need builders.',480,1.3,3.6,{drop:1});
+// end card
+const E0=4.3;
+add('t org','Effective Altruism <span>Israel</span>',150,E0,99);
+add('t kicker','IMPACT SUMMIT 2027',300,E0+.25,99);
+add('bar','',378,E0+.45,99,{bar:150});
+const ww=add('t big','<i>What we</i>',410,E0+.6,99);
+const bd=add('t big coral','<i>Build</i>',410,E0+1.15,99,{drop:1});
+add('t tag','Building for what comes next.',650,E0+1.9,99);
+add('t meta',CFG.date+' | '+CFG.city,770,E0+2.4,99);
+function drawText(t){
+  for(const {d,tin,tout,opt} of els){
+    const a=ease((t-tin)/.5), o=1-ease((t-tout)/.35);
+    d.style.opacity=t<tin?0:Math.min(a*1.4,1)*o;
+    if(opt.left)d.style.left=opt.left+'px';
+    if(opt.bar!==undefined){d.style.width=opt.bar*a+'px';continue;}
+    const y=opt.drop?(1-back((t-tin)/.5))*-140:(1-a)*40;
+    d.style.transform=`translateY(${y-(1-o)*30}px)`;
+  }
+}
+// cube schedule: a few blocks during the opening line, the full structure on the end card
+const progress={pts:[[0.2,0],[3.6,.14],[4.2,.2],[7.2,1]],
+  inv(n){const p=this.pts;for(let k=1;k<p.length;k++)if(n<=p[k][1])return p[k-1][0]+(n-p[k-1][1])/(p[k][1]-p[k-1][1])*(p[k][0]-p[k-1][0]);return p[p.length-1][0];}};
+window.renderAt=t=>{drawBg(t);drawCubes(t,progress);drawText(t);};
+document.fonts.ready.then(()=>{bd.style.left=(120+ww.offsetWidth+55)+'px';window.renderAt(+(new URLSearchParams(location.search).get('t')||9));window.READY=true;});
+</script></body></html>
