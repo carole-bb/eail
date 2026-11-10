@@ -116,6 +116,8 @@ p+p{margin-top:.9em}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,88,62,.55)}60%{box-shadow:0 0 0 .7em rgba(244,88,62,0)}}
 .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:clamp(18px,2.6vw,28px);margin-bottom:1.4em}
 .people:empty,.orgs:empty{display:none}
+.canva{position:relative;width:100%;background:#fff;box-shadow:-8px 8px 0 var(--blue);margin-bottom:1.6em}
+.canva iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .person{background:#fff;box-shadow:-8px 8px 0 var(--blue)}
 .person:nth-child(4n+2){box-shadow:-8px 8px 0 var(--coral)} .person:nth-child(4n+3){box-shadow:-8px 8px 0 var(--navy)} .person:nth-child(4n+4){box-shadow:-8px 8px 0 var(--peach)}
 .person .ph{aspect-ratio:1;background:var(--sky) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:56px;color:var(--navy)}
@@ -279,12 +281,25 @@ p+p{margin-top:.9em}
    ====================================================================== */
 var SPEAKERS = [
 ];
+
+/* OPTION 2 — show the speakers straight from a Canva design, so you only ever edit Canva.
+   In Canva: Share > Embed > copy the "smart embed link" (it ends with /view?embed) and paste it as url.
+   Never paste the normal sharing/edit link here. width/height = the Canva page size in px. */
+var CANVA_SPEAKERS = { url: '', width: 1366, height: 768 };
 var ORGS = [
 ];
 
 (function(){
   /* ---- build the speaker and organization cards from the lists above ---- */
   function el(tag,cls,txt){ var e=document.createElement(tag); e.className=cls; if(txt) e.textContent=txt; return e; }
+  var cu = (CANVA_SPEAKERS.url||'').trim();
+  if (/^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view(\?|$)/.test(cu)){
+    var box = el('div','canva rv'), fr = document.createElement('iframe');
+    box.style.aspectRatio = CANVA_SPEAKERS.width + ' / ' + CANVA_SPEAKERS.height;
+    fr.src = cu.indexOf('embed')>-1 ? cu : cu + (cu.indexOf('?')>-1?'&':'?') + 'embed';
+    fr.loading = 'lazy'; fr.title = 'דוברים ודוברות'; fr.setAttribute('allow','fullscreen');
+    box.appendChild(fr); var host = document.getElementById('speakers'); host.className = ''; host.appendChild(box); SPEAKERS = [];
+  }
   SPEAKERS.forEach(function(sp,n){
     var c=el('div','person rv'), ph=el('div','ph'); c.style.setProperty('--i',n%4);
     if(sp.photo){ ph.style.backgroundImage='url("'+encodeURI(sp.photo)+'")'; ph.setAttribute('role','img'); ph.setAttribute('aria-label',sp.name||''); }
