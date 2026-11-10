@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impact Summit 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#2a0e5c; --navy-d:#1a0a46; --coral:#f4583e; --blue:#2f6db8; --sky:#b5d6ee; --peach:#f9b9a2; --cream:#faf5ed;
+  --pad:clamp(18px,5vw,64px); --gap:clamp(12px,2vw,20px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;overflow-x:hidden}
+body{font-family:Heebo,Arial,sans-serif;color:var(--navy);background:linear-gradient(160deg,#fdf6ee 0%,#eef0f8 55%,#cfe2f3 100%);
+  line-height:1.65;font-size:clamp(16px,1.5vw,19px);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:0 var(--pad)}
+section{padding:clamp(36px,6vw,72px) 0}
+h2{font-weight:900;font-size:clamp(28px,4.6vw,48px);line-height:1.15;margin-bottom:.55em}
+h2::after{content:"";display:block;width:84px;height:6px;background:var(--coral);margin-top:.35em}
+p+p{margin-top:.9em}
+.lead{font-size:clamp(18px,2.1vw,24px);font-weight:500}
+.en{font-family:'Bebas Neue',Heebo,sans-serif;letter-spacing:.12em;direction:ltr;unicode-bidi:isolate}
+
+/* reveal: blocks drop into place */
+.rv{opacity:0;transform:translateY(-34px);transition:opacity .55s ease,transform .7s cubic-bezier(.2,1.5,.4,1);transition-delay:calc(var(--i,0)*90ms)}
+.rv.in{opacity:1;transform:none}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:clamp(40px,7vw,90px) 0 clamp(36px,6vw,72px)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero .wrap{position:relative}
+.kicker{font-size:clamp(22px,3.2vw,40px);display:inline-block}
+.title{font-family:Anton,Heebo,sans-serif;font-style:italic;text-transform:uppercase;direction:ltr;unicode-bidi:isolate;
+  font-size:clamp(46px,10.5vw,128px);line-height:1.02;margin:.08em 0 .18em;display:flex;flex-wrap:wrap;gap:0 .28em;justify-content:flex-end}
+.title b{font-weight:400;color:var(--coral)}
+.tagline{font-weight:700;font-size:clamp(18px,2.6vw,30px);max-width:22em}
+.meta{margin-top:.7em;font-weight:700;font-size:clamp(16px,2vw,22px);display:flex;flex-wrap:wrap;gap:.3em .9em}
+.meta span{background:var(--navy);color:#fff;padding:.15em .7em}
+.meta span:nth-child(2){background:var(--coral)}
+.count{display:flex;gap:var(--gap);margin-top:clamp(20px,3vw,34px);direction:ltr;justify-content:flex-end}
+.count div{flex:1 1 0;min-width:0;max-width:112px;background:#fff;box-shadow:8px 8px 0 var(--blue);padding:.45em .3em .35em;text-align:center}
+.count div:nth-child(2){box-shadow:8px 8px 0 var(--coral)}
+.count div:nth-child(3){box-shadow:8px 8px 0 var(--navy)}
+.count div:nth-child(4){box-shadow:8px 8px 0 var(--peach)}
+.count strong{display:block;font-family:Anton,sans-serif;font-weight:400;font-size:clamp(30px,5vw,54px);line-height:1.05}
+.count small{font-size:clamp(12px,1.3vw,15px);font-weight:700;direction:rtl;display:block}
+.intro{margin-top:clamp(26px,4vw,44px);max-width:38em;background:#fff;padding:clamp(14px,2.2vw,24px);border-inline-start:6px solid var(--coral)}
+
+/* stacked question blocks */
+.stack{display:flex;flex-direction:column;gap:10px;margin-top:1.4em}
+.stack .blk{font-weight:900;font-size:clamp(19px,2.9vw,34px);line-height:1.25;padding:.5em .8em;color:#fff;background:var(--navy);width:fit-content;max-width:100%}
+.stack .blk:nth-child(2){background:var(--blue);margin-inline-start:clamp(0px,3vw,36px)}
+.stack .blk:nth-child(3){background:var(--coral);margin-inline-start:clamp(0px,6vw,72px)}
+
+/* last year */
+.dark{background:var(--navy-d);color:#fff}
+.dark h2{color:#fff}
+.stat{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(16px,4vw,48px)}
+.stat .num{font-family:Anton,sans-serif;font-size:clamp(96px,20vw,230px);line-height:.95;color:var(--coral);direction:ltr}
+.stat .txt{flex:1 1 300px}
+.punch{display:inline-block;margin-top:1.1em;font-weight:900;font-size:clamp(20px,2.8vw,32px);background:var(--coral);color:#fff;padding:.25em .7em}
+.bigq{margin-top:clamp(28px,5vw,56px);font-weight:900;font-size:clamp(26px,5vw,58px);line-height:1.18}
+.bigq em{font-style:normal;color:var(--peach)}
+
+/* topics */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:var(--gap);margin-top:1.3em}
+.topic{font-weight:900;font-size:clamp(19px,2.2vw,25px);line-height:1.25;padding:1.05em .9em;min-height:4.6em;display:flex;align-items:flex-end;
+  color:#fff;background:var(--navy);cursor:default;transition:transform .25s cubic-bezier(.2,1.5,.4,1),box-shadow .25s,opacity .55s}
+.topic:nth-child(6n+2){background:var(--blue)} .topic:nth-child(6n+3){background:var(--coral)}
+.topic:nth-child(6n+4){background:var(--sky);color:var(--navy)} .topic:nth-child(6n+5){background:var(--peach);color:var(--navy)}
+.topic:nth-child(6n+6){background:#163a78}
+.topic.in:hover{transform:translate(4px,-6px);box-shadow:-8px 8px 0 rgba(42,14,92,.25)}
+
+/* programme: expandable blocks */
+.prog{display:flex;flex-direction:column;gap:var(--gap);margin-top:1.2em}
+.item{background:#fff;box-shadow:-8px 8px 0 var(--blue)}
+.item:nth-child(2){box-shadow:-8px 8px 0 var(--coral)} .item:nth-child(3){box-shadow:-8px 8px 0 var(--navy)} .item:nth-child(4){box-shadow:-8px 8px 0 var(--peach)}
+.item button{all:unset;box-sizing:border-box;display:flex;gap:.7em;align-items:center;width:100%;cursor:pointer;padding:.85em 1em;
+  font-family:inherit;font-weight:900;font-size:clamp(18px,2.2vw,24px);line-height:1.3;color:var(--navy)}
+.item button:focus-visible{outline:3px solid var(--coral);outline-offset:-3px}
+.item .ic{flex:none;width:1.5em;height:1.5em;background:var(--coral);position:relative;transition:transform .3s}
+.item .ic::before,.item .ic::after{content:"";position:absolute;left:50%;top:50%;width:54%;height:3px;background:#fff;transform:translate(-50%,-50%)}
+.item .ic::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .3s}
+.item.open .ic::after{transform:translate(-50%,-50%) rotate(0)}
+.item .body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.item.open .body{grid-template-rows:1fr}
+.item .body>div{overflow:hidden}
+.item .body p{padding:0 1em 1.1em calc(1em);padding-inline-start:calc(1em + 1.5em * 1.25 + .7em)}
+
+/* price */
+.price{display:flex;flex-wrap:wrap;gap:var(--gap);align-items:stretch;margin-top:1.2em}
+.tag{flex:0 1 240px;background:var(--coral);color:#fff;padding:.6em 1em;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.tag strong{font-family:Anton,sans-serif;font-weight:400;font-size:clamp(64px,10vw,104px);line-height:1}
+.tag span{font-weight:700}
+.price .txt{flex:1 1 300px;background:#fff;padding:clamp(14px,2.2vw,24px);display:flex;flex-direction:column;justify-content:center;gap:.6em}
+.refund{background:var(--sky);padding:.6em .8em;font-weight:700}
+
+/* audience list */
+.list{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:var(--gap);margin-top:1.2em}
+.list li{background:#fff;padding:.85em 1em;font-weight:700;display:flex;gap:.7em;align-items:center;border-inline-start:8px solid var(--coral)}
+.list li:nth-child(2){border-color:var(--blue)} .list li:nth-child(3){border-color:var(--navy)} .list li:nth-child(4){border-color:var(--peach)}
+
+/* "updating weekly" */
+.soon{display:inline-flex;align-items:center;gap:.6em;background:#fff;padding:.5em 1em;font-weight:700}
+.dot{width:.8em;height:.8em;border-radius:50%;background:var(--coral);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,88,62,.55)}60%{box-shadow:0 0 0 .7em rgba(244,88,62,0)}}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(24px,4vw,48px)}
+
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.dot{animation:none}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <canvas id="cubes" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="en kicker rv">IMPACT SUMMIT 2027</div>
+    <h1 class="title rv" style="--i:1"><span>What we</span> <b>Build</b></h1>
+    <p class="tagline rv" style="--i:2">מה אנחנו בונים כדי להבטיח עתיד טוב יותר?</p>
+    <div class="meta rv" style="--i:3"><span>יום שישי</span><span dir="ltr">29.01.2027</span><span>תל אביב</span></div>
+    <div class="count rv" style="--i:4" id="count" aria-label="ספירה לאחור לכנס">
+      <div><strong data-u="d">0</strong><small>ימים</small></div>
+      <div><strong data-u="h">0</strong><small>שעות</small></div>
+      <div><strong data-u="m">0</strong><small>דקות</small></div>
+      <div><strong data-u="s">0</strong><small>שניות</small></div>
+    </div>
+    <p class="intro lead rv" style="--i:5">ה-Impact Summit הינו כנס ייחודי בארץ, שמפגיש בין אנשים שמובילים שינוי אמיתי ומשפיעים על חייהם של מיליונים ברחבי העולם.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="lead rv">דווקא השנה, כשהסכנות הכרוכות בטכנולוגיות מתקדמות תופסות כותרות ונראות קרובות מתמיד, כשמאזן הכוחות העולמי משתנה ואי־הוודאות לגבי העתיד גוברת, אנחנו מזמינים אתכם לעצור לרגע ולשאול:</p>
+    <div class="stack">
+      <div class="blk rv" style="--i:1">מהם האתגרים הגדולים של זמננו?</div>
+      <div class="blk rv" style="--i:3">איך נוכל להתמודד איתם וליצור עולם טוב יותר?</div>
+      <div class="blk rv" style="--i:5">ולמען מי אנחנו עושים זאת?</div>
+    </div>
+  </div>
+</section>
+
+<section class="dark">
+  <div class="wrap">
+    <div class="stat">
+      <div class="num rv" data-count="220">220</div>
+      <div class="txt rv" style="--i:2">
+        <p class="lead">בשנה שעברה התכנסו 220 משתתפים לכנס הראשון של אלטרואיזם אפקטיבי ישראל.</p>
+        <p>ביום אחד נוצרו חיבורים שהמשיכו הרבה מעבר לכנס: אנשים שבחרו לשנות כיוון בקריירה, יזמים שמצאו שותפים לדרך, משתתפים שהחליטו לחזור ללימודים ושיתופי פעולה חדשים בין ארגונים.</p>
+        <span class="punch">כל אלה התחילו ממפגש אחד.</span>
+      </div>
+    </div>
+    <p class="bigq rv">השנה אנחנו חוזרים עם שאלה אחת במרכז: <em>מה אנחנו בונים כדי להבטיח עתיד טוב יותר?</em></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="rv">מה מצפה לנו?</h2>
+    <p class="lead rv">יום אחד של הרצאות, סדנאות, שיחות אישיות ויריד הזדמנויות עם 20+ ארגוני אימפקט.</p>
+    <p class="rv" style="margin-top:1.4em;font-weight:700">מבין הנושאים שנחקור:</p>
+    <div class="grid">
+      <div class="topic rv" style="--i:0">בטיחות בינה מלאכותית</div>
+      <div class="topic rv" style="--i:1">מניעת מגפות עולמיות</div>
+      <div class="topic rv" style="--i:2">רווחת בעלי חיים</div>
+      <div class="topic rv" style="--i:3">עוני ובריאות עולמית</div>
+      <div class="topic rv" style="--i:4">משבר האקלים</div>
+      <div class="topic rv" style="--i:5">גיאופוליטיקה ועתיד הסדר העולמי</div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <h2 class="rv">מה בתוכנית?</h2>
+    <div class="prog" id="prog">
+      <div class="item open rv" style="--i:0"><button aria-expanded="true"><span class="ic"></span>יריד הזדמנויות עם 20+ ארגוני אימפקט</button>
+        <div class="body"><div><p>אם אתם שוקלים את הצעד הבא - תעסוקה, לימודים, או כיוון חדש - זה מקום לפגוש ארגונים ולהכיר הזדמנויות חדשות.</p></div></div></div>
+      <div class="item open rv" style="--i:1"><button aria-expanded="true"><span class="ic"></span>שיחות 1-על-1 ממוקדות</button>
+        <div class="body"><div><p>מפגשים קצרים שמאפשרים להתייעץ על רעיון, למצוא שותפים, לקבל חיבור לארגון, ולפתוח אפשרויות חדשות, בלי מבוכה.</p></div></div></div>
+      <div class="item open rv" style="--i:2"><button aria-expanded="true"><span class="ic"></span>הרצאות של יזמים ויזמיות מובילים על יצירת אימפקט</button>
+        <div class="body"><div><p>פאנל יזמים בתחומים שבהם חדשנות ישראלית יכולה להשפיע על העולם.</p></div></div></div>
+      <div class="item open rv" style="--i:3"><button aria-expanded="true"><span class="ic"></span>סדנאות מעשיות</button>
+        <div class="body"><div><p>כלים פרקטים לתכנן את השלב הבא בקריירה עם אימפקט</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <h2 class="rv">כמה זה עולה?</h2>
+    <div class="price">
+      <div class="tag rv"><strong>90</strong><span>ש״ח</span></div>
+      <div class="txt rv" style="--i:1">
+        <p class="lead">עלות הכרטיס מסובסדת של 90 ש״ח, כולל ארוחה טבעונית.</p>
+        <p class="refund">📣 השתתפתם בכנס ומרגישים שהוא לא היה מועיל עבורכם? תקבלו החזר מלא.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="dark">
+  <div class="wrap">
+    <h2 class="rv">למה הכנס הזה חשוב?</h2>
+    <p class="lead rv">בכנס אימפקט של EA ישראל תמצאו לא רק השראה, אלא גם כלים, תובנות, ואסטרטגיות מעשיות שיאפשרו לכם להפוך חשיבה לפעולה.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="rv">הכנס מתאים במיוחד למי שרוצה:</h2>
+    <ul class="list">
+      <li class="rv" style="--i:0">להתחבר לארגונים ויזמים פורצי דרך</li>
+      <li class="rv" style="--i:1">ללמוד על האתגרים הגדולים</li>
+      <li class="rv" style="--i:2">לבנות קריירה עם אימפקט משמעותי</li>
+      <li class="rv" style="--i:3">לתרום לעמותות האפקטיביות ביותר</li>
+    </ul>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap two">
+    <div>
+      <h2 class="rv">דוברים ודוברות</h2>
+      <div class="soon rv"><span class="dot"></span>מתעדכן מידי שבוע</div>
+    </div>
+    <div>
+      <h2 class="rv">הארגונים שתפגשו בכנס</h2>
+      <div class="soon rv"><span class="dot"></span>מתעדכן מידי שבוע</div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- countdown to 29.01.2027, 09:00 Israel time ---- */
+  var target = Date.UTC(2027,0,29,7,0,0), box = document.getElementById('count');
+  function tick(){
+    var s = Math.floor((target - Date.now())/1000);
+    if (s <= 0){ box.innerHTML = '<div style="flex:1 1 100%"><strong style="font-family:Heebo;font-weight:900;direction:rtl">הכנס כבר כאן!</strong></div>'; clearInterval(timer); return; }
+    var v = {d:Math.floor(s/86400), h:Math.floor(s%86400/3600), m:Math.floor(s%3600/60), s:s%60};
+    box.querySelectorAll('strong').forEach(function(el){ var n=v[el.dataset.u]; el.textContent = el.dataset.u==='d' ? n : String(n).padStart(2,'0'); });
+  }
+  var timer = setInterval(tick,1000); tick();
+
+  /* ---- programme: click a block to open / close it ---- */
+  document.getElementById('prog').addEventListener('click',function(e){
+    var b = e.target.closest('button'); if(!b) return;
+    var open = b.parentNode.classList.toggle('open'); b.setAttribute('aria-expanded',open); setTimeout(reportHeight,400);
+  });
+
+  /* ---- count-up number ---- */
+  function countUp(el){
+    var n = +el.dataset.count, t0 = performance.now();
+    if (reduce){ el.textContent = n; return; }
+    (function step(t){ var p = Math.min(1,(t-t0)/1400); el.textContent = Math.round(n*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(step); })(t0);
+  }
+
+  /* ---- reveal on scroll ---- */
+  var items = document.querySelectorAll('.rv');
+  function show(el){ el.classList.add('in'); if(el.dataset.count) countUp(el); }
+  if ('IntersectionObserver' in window && !reduce){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ show(e.target); io.unobserve(e.target); } }); },{threshold:.15});
+    items.forEach(function(el){ io.observe(el); });
+  } else items.forEach(show);
+
+  /* ---- stacking cubes in the hero ---- */
+  var cv = document.getElementById('cubes'), cx = cv.getContext('2d'), seed = 7;
+  function rnd(){ return (seed = seed*16807 % 2147483647)/2147483647; }
+  var PAL = [
+    {t:['#d8ebf8','#b5d6ee'],l:['#4f8fd2','#2f6db8'],r:['#27589f','#163a78']},
+    {t:['#ffd9c8','#f9b9a2'],l:['#f77a5e','#ee5438'],r:['#d8452f','#b33324']},
+    {t:['#fffaf2','#f8e6d6'],l:['#f3dccb','#e6c0ad'],r:['#dcb09e','#c79584']},
+    {t:['#8f9bd6','#6a78c2'],l:['#3a348c','#2a1f6c'],r:['#21154f','#150c38']},
+    {t:['#eaf4fb','#cfe4f3'],l:['#8dbbe2','#5f9ad0'],r:['#4a7fbd','#2d5c9c']}], cubes = [];
+  for (var i=0;i<=9;i++) for (var j=0;j<=9;j++){
+    if (i+j<2 || i+j>11) continue;
+    var h = Math.min(5, Math.floor((j-i+3)*.8 + rnd()*1.5)); if (h<=0) continue;   /* rises toward the left edge (RTL layout) */
+    var p = PAL[Math.floor(rnd()*PAL.length)];
+    for (var k=0;k<h;k++) cubes.push({i:i,j:j,k:k,p:rnd()<.3?PAL[Math.floor(rnd()*PAL.length)]:p,o:k*3+rnd()*4});
+  }
+  cubes.sort(function(a,b){return a.o-b.o}).forEach(function(c,n){ c.t0 = .2 + n/cubes.length*3.2; });
+  var order = cubes.slice().sort(function(a,b){ return (a.i+a.j)-(b.i+b.j) || a.k-b.k; });
+  function back(x){ x=Math.min(1,Math.max(0,x)); var c=1.70158; return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2); }
+  function face(pts,cols,y0,y1){ var g=cx.createLinearGradient(0,y0,0,y1); g.addColorStop(0,cols[0]); g.addColorStop(1,cols[1]); cx.fillStyle=g;
+    cx.beginPath(); pts.forEach(function(q,n){ n?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.closePath(); cx.fill(); }
+  var W=0,H=0,start=null;
+  function size(){ var r=cv.getBoundingClientRect(), d=Math.min(2,window.devicePixelRatio||1); W=r.width; H=r.height; cv.width=W*d; cv.height=H*d; cx.setTransform(d,0,0,d,0,0); }
+  function draw(t){
+    cx.clearRect(0,0,W,H);
+    var a = Math.max(22, Math.min(54, W/26)), b = a*.57, hh = a*1.15, ox = a*1.2, oy = H - a*5.2;
+    cx.globalAlpha = W < 700 ? .28 : .9;            /* on phones the cubes sit behind the text, so keep them faint */
+    order.forEach(function(c){
+      if (t < c.t0) return;
+      var e = back((t-c.t0)/.55), x = ox+(c.i-c.j)*a, y = oy+(c.i+c.j)*b - c.k*hh - (1-e)*a*5;
+      face([[x,y-hh],[x+a,y-hh+b],[x,y-hh+2*b],[x-a,y-hh+b]],c.p.t,y-hh,y-hh+2*b);
+      face([[x-a,y-hh+b],[x,y-hh+2*b],[x,y+2*b],[x-a,y+b]],c.p.l,y-hh+b,y+2*b);
+      face([[x+a,y-hh+b],[x,y-hh+2*b],[x,y+2*b],[x+a,y+b]],c.p.r,y-hh+b,y+2*b);
+    });
+    cx.globalAlpha = 1;
+  }
+  function frame(ts){ if(start===null) start=ts; var t=(ts-start)/1000; draw(t); if(t<4.2) requestAnimationFrame(frame); }
+  size(); if (reduce) draw(99); else requestAnimationFrame(frame);
+
+  /* ---- tell the parent page how tall the content is (optional, for auto-height setups) ---- */
+  function reportHeight(){ try{ parent.postMessage({type:'impact-summit-height',height:document.documentElement.scrollHeight},'*'); }catch(e){} }
+  var rt; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ size(); draw(99); reportHeight(); },150); });
+  window.addEventListener('load',reportHeight); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(reportHeight);
+})();
+</script>
+</body>
+</html>
