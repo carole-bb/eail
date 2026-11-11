@@ -1,7 +1,8 @@
 # Synthesises an original 40 s music bed (C-G-Am-F, 100 BPM) timed to the cuts in video.html.
 import numpy as np, wave, sys
 SHORT=len(sys.argv)>2 and sys.argv[2]=='short'   # 20 s vertical cut
-sr=44100; BEAT=.6; BAR=2.4; DUR=20.0 if SHORT else 40.0; N=int(sr*DUR); L=np.zeros(N); R=np.zeros(N)
+IV=len(sys.argv)>2 and sys.argv[2]=='iv'         # interview cut: python make_music.py out.wav iv DUR TB TC TD TE
+sr=44100; BEAT=.6; BAR=2.4; DUR=float(sys.argv[3]) if IV else 20.0 if SHORT else 40.0; N=int(sr*DUR); L=np.zeros(N); R=np.zeros(N)
 rng=np.random.default_rng(3)
 def put(sig,t,g=1.0,pan=0.0):
     i=int(t*sr); n=min(len(sig),N-i)
@@ -16,8 +17,8 @@ def hat():
     t=np.arange(int(.05*sr))/sr; n=rng.standard_normal(len(t)); n=np.diff(n,prepend=0); return n*np.exp(-t*90)
 note=lambda m:440*2**((m-69)/12)
 CH=[[48,55,60,64,67],[43,55,59,62,67],[45,57,60,64,69],[41,53,57,60,65]]  # C G Am F
-TB,TC,TD,TE=(6.6,6.6,12.6,15.6) if SHORT else (7.2,12,21.6,28.8)
-TAIL=DUR-4; STEP,PUNCH=(.55,3.3) if SHORT else (.6,4.2)
+TB,TC,TD,TE=tuple(map(float,sys.argv[4:8])) if IV else (6.6,6.6,12.6,15.6) if SHORT else (7.2,12,21.6,28.8)
+TAIL=DUR-4; STEP,PUNCH=(.6,.3) if IV else (.55,3.3) if SHORT else (.6,4.2)
 nb=int(np.ceil(DUR/BAR))
 for b in range(nb):
     t0=b*BAR; ch=CH[b%4]; end=t0>=TAIL
@@ -38,7 +39,7 @@ for b in range(nb):
             if sec in 'CE': put(kick(),t,.55); put(tone(note(ch[0]-12),.5,harm=(1,.3),dec=5),t,.28)
             elif sec=='B' and k%4==0: put(kick(.7),t,.4); put(tone(note(ch[0]-12),1.0,harm=(1,.3),dec=3),t,.22)
 # opening: one soft thud + note per problem block, then a bigger hit on the punchline
-for n in range(5):
+for n in range(0 if IV else 5):
     t=(.3 if SHORT else .6)+n*STEP; put(kick(.8),t,.45); put(tone(note([60,62,64,67,69][n]),.9,dec=5),t,.16)
 put(kick(),PUNCH,.7); put(tone(note(36),2.0,harm=(1,.4),dec=1.5),PUNCH,.3); put(tone(note(72),1.5,dec=3),PUNCH,.16)
 # risers into the cuts, impact on the end card

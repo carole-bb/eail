@@ -13,7 +13,7 @@ const path = require('path');
     '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'medium', ...(audio ? ['-c:a', 'aac', '-b:a', '192k', '-shortest'] : []),
     '-movflags', '+faststart', out];
   const ff = spawn('ffmpeg', args, { stdio: ['pipe', 'ignore', 'inherit'] });
-  for (let f = 0; f < dur * fps; f++) {
+  for (let f = 0; f < Math.round(dur * fps); f++) {
     await page.evaluate(t => window.renderAt(t), f / fps);
     if (!ff.stdin.write(await page.screenshot({ type: 'jpeg', quality: 95 }))) await new Promise(r => ff.stdin.once('drain', r));
   }
