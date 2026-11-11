@@ -16,8 +16,8 @@ def hat():
     t=np.arange(int(.05*sr))/sr; n=rng.standard_normal(len(t)); n=np.diff(n,prepend=0); return n*np.exp(-t*90)
 note=lambda m:440*2**((m-69)/12)
 CH=[[48,55,60,64,67],[43,55,59,62,67],[45,57,60,64,69],[41,53,57,60,65]]  # C G Am F
-TB,TC,TD,TE=(4.8,7.8,13.2,15.6) if SHORT else (7.2,12,21.6,28.8)
-TAIL=DUR-4; STEP,PUNCH=(.42,2.7) if SHORT else (.6,4.2)
+TB,TC,TD,TE=(6.6,6.6,12.6,15.6) if SHORT else (7.2,12,21.6,28.8)
+TAIL=DUR-4; STEP,PUNCH=(.55,3.3) if SHORT else (.6,4.2)
 nb=int(np.ceil(DUR/BAR))
 for b in range(nb):
     t0=b*BAR; ch=CH[b%4]; end=t0>=TAIL
@@ -44,7 +44,7 @@ put(kick(),PUNCH,.7); put(tone(note(36),2.0,harm=(1,.4),dec=1.5),PUNCH,.3); put(
 # risers into the cuts, impact on the end card
 def riser(d):
     t=np.arange(int(d*sr))/sr; n=rng.standard_normal(len(t)); n=np.diff(n,prepend=0); return n*(t/d)**3
-for T,g in [(TB,.05),(TC,.06),(TE,.12)]: put(riser(1.2),T-1.2,g)
+for T,g in sorted({TB:.05,TC:.06,TE:.12}.items()): put(riser(1.2),T-1.2,g)
 put(kick(),TE,.8); put(tone(note(36),3.0,harm=(1,.4),dec=1.0),TE,.35)
 # simple reverb + master
 ir=rng.standard_normal(int(1.6*sr))*np.exp(-np.arange(int(1.6*sr))/sr*4.5)
