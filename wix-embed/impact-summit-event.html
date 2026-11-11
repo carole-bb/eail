@@ -117,7 +117,9 @@ p+p{margin-top:.9em}
 .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:clamp(18px,2.6vw,28px);margin-bottom:1.4em}
 .people:empty,.orgs:empty{display:none}
 .canva{position:relative;width:100%;max-width:620px;background:#fff;box-shadow:-8px 8px 0 var(--blue);margin-bottom:1.6em}
+.canva{overflow:hidden}
 .canva iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.canva.crop iframe{top:-72px;height:calc(100% + 144px)}
 .canva:not(:last-child){margin-bottom:0}
 .hint{position:absolute;inset-inline:0;bottom:14px;margin:auto;width:fit-content;display:flex;align-items:center;gap:.5em;pointer-events:none;
   background:var(--coral);color:#fff;font-weight:900;font-size:clamp(15px,1.6vw,18px);padding:.45em .9em;box-shadow:-5px 5px 0 var(--navy);
@@ -299,16 +301,17 @@ var SPEAKERS = [
                  2 = twice that height, and so on.  CHANGE THIS when the design gets taller or shorter.
      width     = width of the Canva page, rowHeight = height of one screen (same units; only the proportion matters).
      maxWidth  = widest the frame may get on a big screen, in pixels.
+     hideControls = true hides Canva's own dark bar ("..." and full-screen buttons) that otherwise covers the bottom of the design.
      scrollHint = true shows a "scroll for more" badge and note (only useful if you keep the frame shorter than the content). */
 var CANVA_SPEAKERS = { url: 'https://www.canva.com/design/DAHWrUeaBRI/TJenzxgltaJ_n6PEGXau-A/view?embed',
-                       rows: 1, width: 1366, rowHeight: 768, maxWidth: 620, scrollHint: false };
+                       rows: 1, width: 1366, rowHeight: 768, maxWidth: 620, hideControls: true, scrollHint: false };
 var ORGS = [
 ];
 
 /* OPTION 2 for the organizations — the logos straight from a Canva design. Same settings as the speakers above:
    change "rows" whenever the Canva design gets taller or shorter. Leave url as '' to use the ORGS list instead. */
 var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvUggKQIjAQ/view?embed',
-                   rows: 1, width: 1366, rowHeight: 768, maxWidth: 760, scrollHint: false };
+                   rows: 1, width: 1366, rowHeight: 768, maxWidth: 760, hideControls: true, scrollHint: false };
 
 (function(){
   /* ---- build the speaker and organization cards from the lists above ---- */
@@ -316,7 +319,7 @@ var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvU
   function canva(cfg,hostId,title){            /* returns true when a valid Canva embed link was set */
     var cu = ((cfg&&cfg.url)||'').trim();
     if (!/^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view(\?|$)/.test(cu)) return false;
-    var box = el('div','canva rv'), fr = document.createElement('iframe'),
+    var box = el('div','canva rv'+(cfg.hideControls?' crop':'')), fr = document.createElement('iframe'),
         h = cfg.rowHeight ? cfg.rowHeight*Math.max(1,+cfg.rows||1) : cfg.height;      /* frame as tall as the content */
     box.style.aspectRatio = cfg.width + ' / ' + h; if (cfg.maxWidth) box.style.maxWidth = cfg.maxWidth + 'px';
     fr.src = cu.indexOf('embed')>-1 ? cu : cu + (cu.indexOf('?')>-1?'&':'?') + 'embed';
