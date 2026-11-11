@@ -121,13 +121,16 @@ p+p{margin-top:.9em}
 .canva iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .canva.crop iframe{top:-72px;height:calc(100% + 144px)}
 .canva:not(:last-child){margin-bottom:0}
-.hint{position:absolute;inset-inline:0;bottom:14px;margin:auto;width:fit-content;display:flex;align-items:center;gap:.5em;pointer-events:none;
-  background:var(--coral);color:#fff;font-weight:900;font-size:clamp(15px,1.6vw,18px);padding:.45em .9em;box-shadow:-5px 5px 0 var(--navy);
+.canva.scroll{border-bottom:8px solid var(--coral)}
+.canva.scroll::after{content:"";position:absolute;inset-inline:0;bottom:0;height:90px;pointer-events:none;background:linear-gradient(rgba(42,14,92,0),rgba(42,14,92,.38));transition:opacity .5s}
+.canva.scroll.seen::after{opacity:0}
+.hint{z-index:1;position:absolute;inset-inline:0;bottom:16px;margin:auto;width:fit-content;display:flex;align-items:center;gap:.5em;pointer-events:none;
+  background:var(--coral);color:#fff;font-weight:900;font-size:clamp(16px,1.8vw,21px);padding:.5em 1em;box-shadow:-5px 5px 0 var(--navy);
   animation:nudge 1.3s ease-in-out infinite;transition:opacity .5s}
 .hint.off{opacity:0}
 .hint i,.cap i{width:.6em;height:.6em;border:solid currentColor;border-width:0 3px 3px 0;transform:rotate(45deg);margin-top:-.3em}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
-.cap{display:flex;align-items:center;gap:.6em;max-width:620px;margin:1.1em 0 1.6em;font-weight:700;font-size:.95em}
+.cap{display:flex;align-items:center;gap:.6em;max-width:620px;margin:1.1em 0 1.6em;font-weight:900;font-size:1.05em;color:var(--coral)}
 .cap i{flex:none;color:var(--coral)}
 .person{background:#fff;box-shadow:-8px 8px 0 var(--blue)}
 .person:nth-child(4n+2){box-shadow:-8px 8px 0 var(--coral)} .person:nth-child(4n+3){box-shadow:-8px 8px 0 var(--navy)} .person:nth-child(4n+4){box-shadow:-8px 8px 0 var(--peach)}
@@ -295,21 +298,23 @@ var SPEAKERS = [
    In Canva: Share > Embed > copy the "smart embed link" (it ends with /view?embed) and paste it as url.
    Never paste the normal sharing/edit link here.
 
-   FRAME SIZE — the frame is made as tall as the Canva content, so nobody has to scroll inside it.
-   The page cannot read the size from Canva, so it works it out from "rows":
-     rows      = how tall the Canva design is now, counted in screens: 1 = one 1366 x 768 screen (one speaker card),
-                 2 = twice that height, and so on.  CHANGE THIS when the design gets taller or shorter.
-     width     = width of the Canva page, rowHeight = height of one screen (same units; only the proportion matters).
-     maxWidth  = widest the frame may get on a big screen, in pixels.
-     hideControls = true hides Canva's own dark bar ("..." and full-screen buttons) that otherwise covers the bottom of the design.
-     scrollHint = true shows a "scroll for more" badge and note (only useful if you keep the frame shorter than the content). */
+   FRAME SIZE — the page cannot read from Canva how tall the design is, so the frame has a fixed size that you set here.
+     rows      = how many rows of the design the frame shows. One row = one 1366 x 768 screen in Canva (one speaker card).
+                 Halves work: 1.5 shows one full row and the top of the next one, which tells visitors there is more below.
+     width / rowHeight = size of one row in Canva (only the proportion matters).   maxWidth = widest the frame gets, in pixels.
+   TWO WAYS TO USE IT
+     A) Design has MORE rows than the frame shows  ->  scrollHint: true.  Visitors scroll inside the frame; a bouncing
+        "scroll for more" badge and a note under the frame make that obvious. Adding rows in Canva needs no change here.
+     B) Frame shows the WHOLE design               ->  scrollHint: false, hideControls: true, rows = exact number of rows.
+        No scrolling, and Canva's dark button bar is hidden. Change rows whenever the design grows or shrinks. */
 var CANVA_SPEAKERS = { url: 'https://www.canva.com/design/DAHWrUeaBRI/TJenzxgltaJ_n6PEGXau-A/view?embed',
-                       rows: 2, width: 1366, rowHeight: 768, maxWidth: 620, hideControls: true, scrollHint: false };
+                       rows: 1.5, width: 1366, rowHeight: 768, maxWidth: 620, hideControls: false, scrollHint: true };
 var ORGS = [
 ];
 
-/* OPTION 2 for the organizations — the logos straight from a Canva design. Same settings as the speakers above:
-   change "rows" whenever the Canva design gets taller or shorter. Leave url as '' to use the ORGS list instead. */
+/* OPTION 2 for the organizations — the logos straight from a Canva design. Same settings as the speakers above.
+   The logos design is one row tall today, so it is shown whole (way B). When it grows past one row, switch to way A:
+   rows: 1.5, hideControls: false, scrollHint: true.   Leave url as '' to use the ORGS list instead. */
 var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvUggKQIjAQ/view?embed',
                    rows: 1, width: 1366, rowHeight: 768, maxWidth: 760, hideControls: true, scrollHint: false };
 
@@ -319,8 +324,8 @@ var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvU
   function canva(cfg,hostId,title){            /* returns true when a valid Canva embed link was set */
     var cu = ((cfg&&cfg.url)||'').trim();
     if (!/^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view(\?|$)/.test(cu)) return false;
-    var box = el('div','canva rv'+(cfg.hideControls?' crop':'')), fr = document.createElement('iframe'),
-        h = cfg.rowHeight ? cfg.rowHeight*Math.max(1,+cfg.rows||1) : cfg.height;      /* frame as tall as the content */
+    var box = el('div','canva rv'+(cfg.hideControls&&!cfg.scrollHint?' crop':'')), fr = document.createElement('iframe'),
+        h = cfg.rowHeight ? cfg.rowHeight*Math.max(.5,+cfg.rows||1) : cfg.height;
     box.style.aspectRatio = cfg.width + ' / ' + h; if (cfg.maxWidth) box.style.maxWidth = cfg.maxWidth + 'px';
     fr.src = cu.indexOf('embed')>-1 ? cu : cu + (cu.indexOf('?')>-1?'&':'?') + 'embed';
     fr.loading = 'lazy'; fr.title = title; fr.setAttribute('allow','fullscreen'); fr.setAttribute('allowfullscreen','');
@@ -328,9 +333,9 @@ var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvU
     var cap = null;
     if (cfg.scrollHint){   /* optional: a bouncing "scroll" badge on the frame (fades once the visitor reaches it) and a note under it */
       var hint = el('div','hint'); hint.appendChild(el('span','','גללו לעוד')); hint.appendChild(document.createElement('i')); box.appendChild(hint);
-      var off = function(){ setTimeout(function(){ hint.classList.add('off'); },1800); };
+      box.classList.add('scroll'); var off = function(){ setTimeout(function(){ hint.classList.add('off'); box.classList.add('seen'); },2500); };
       box.addEventListener('mouseenter',off); window.addEventListener('blur',function(){ if(document.activeElement===fr) off(); });
-      cap = el('p','cap rv'); cap.appendChild(document.createElement('i')); cap.appendChild(el('span','','יש עוד בפנים: גללו בתוך המסגרת כדי לראות את כולם'));
+      cap = el('p','cap rv'); cap.appendChild(document.createElement('i')); cap.appendChild(el('span','','יש עוד: גללו בתוך המסגרת כדי לראות את כולם'));
       cap.style.maxWidth = box.style.maxWidth;
     }
     var host = document.getElementById(hostId); host.className = ''; host.appendChild(box); if (cap) host.appendChild(cap); return true;
