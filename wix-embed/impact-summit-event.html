@@ -291,7 +291,7 @@ var ORGS = [
 /* OPTION 2 for the organizations — a logo gallery straight from a Canva design, same idea as the speakers.
    Paste the Canva "smart embed link" (ends with /view?embed) as url. A design with several pages shows as a
    gallery with arrows. width/height = the Canva page proportions. Leave url as '' to use the ORGS list instead. */
-var CANVA_ORGS = { url: '', width: 16, height: 9 };
+var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaooneP5Y/EUBAptUtvioJ4KmWPPCyFw/view?embed', width: 2000, height: 2000 };
 
 (function(){
   /* ---- build the speaker and organization cards from the lists above ---- */
@@ -306,7 +306,7 @@ var CANVA_ORGS = { url: '', width: 16, height: 9 };
     box.appendChild(fr); var host = document.getElementById(hostId); host.className = ''; host.appendChild(box); return true;
   }
   if (canva(CANVA_SPEAKERS,'speakers','דוברים ודוברות')) SPEAKERS = [];
-  if (canva(typeof CANVA_ORGS==='undefined'?null:CANVA_ORGS,'orgs','הארגונים שתפגשו בכנס',true)) ORGS = [];
+  if (canva(typeof CANVA_ORGS==='undefined'?null:CANVA_ORGS,'orgs','הארגונים שתפגשו בכנס')) ORGS = [];
   SPEAKERS.forEach(function(sp,n){
     var c=el('div','person rv'), ph=el('div','ph'); c.style.setProperty('--i',n%4);
     if(sp.photo){ ph.style.backgroundImage='url("'+encodeURI(sp.photo)+'")'; ph.setAttribute('role','img'); ph.setAttribute('aria-label',sp.name||''); }
