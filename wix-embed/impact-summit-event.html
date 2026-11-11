@@ -295,19 +295,20 @@ var SPEAKERS = [
 
    FRAME SIZE — the frame is made as tall as the Canva content, so nobody has to scroll inside it.
    The page cannot read the size from Canva, so it works it out from "rows":
-     rows      = how many rows of cards the Canva design has now.  CHANGE THIS when you add or remove a row.
-     width     = width of the Canva page, rowHeight = height of one row (same units; only the proportion matters).
+     rows      = how tall the Canva design is now, counted in screens: 1 = one 1366 x 768 screen (one speaker card),
+                 2 = twice that height, and so on.  CHANGE THIS when the design gets taller or shorter.
+     width     = width of the Canva page, rowHeight = height of one screen (same units; only the proportion matters).
      maxWidth  = widest the frame may get on a big screen, in pixels.
      scrollHint = true shows a "scroll for more" badge and note (only useful if you keep the frame shorter than the content). */
 var CANVA_SPEAKERS = { url: 'https://www.canva.com/design/DAHWrUeaBRI/TJenzxgltaJ_n6PEGXau-A/view?embed',
-                       rows: 3, width: 421, rowHeight: 237, maxWidth: 620, scrollHint: false };
+                       rows: 1, width: 1366, rowHeight: 768, maxWidth: 620, scrollHint: false };
 var ORGS = [
 ];
 
 /* OPTION 2 for the organizations — the logos straight from a Canva design. Same settings as the speakers above:
    change "rows" whenever the Canva design gets taller or shorter. Leave url as '' to use the ORGS list instead. */
 var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvUggKQIjAQ/view?embed',
-                   rows: 2, width: 421, rowHeight: 237, maxWidth: 620, scrollHint: false };
+                   rows: 1, width: 1366, rowHeight: 768, maxWidth: 760, scrollHint: false };
 
 (function(){
   /* ---- build the speaker and organization cards from the lists above ---- */
