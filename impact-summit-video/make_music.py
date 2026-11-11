@@ -1,6 +1,7 @@
 # Synthesises an original 40 s music bed (C-G-Am-F, 100 BPM) timed to the cuts in video.html.
 import numpy as np, wave, sys
-sr=44100; BEAT=.6; BAR=2.4; DUR=40.0; N=int(sr*DUR); L=np.zeros(N); R=np.zeros(N)
+SHORT=len(sys.argv)>2 and sys.argv[2]=='short'   # 20 s vertical cut
+sr=44100; BEAT=.6; BAR=2.4; DUR=20.0 if SHORT else 40.0; N=int(sr*DUR); L=np.zeros(N); R=np.zeros(N)
 rng=np.random.default_rng(3)
 def put(sig,t,g=1.0,pan=0.0):
     i=int(t*sr); n=min(len(sig),N-i)
@@ -15,15 +16,16 @@ def hat():
     t=np.arange(int(.05*sr))/sr; n=rng.standard_normal(len(t)); n=np.diff(n,prepend=0); return n*np.exp(-t*90)
 note=lambda m:440*2**((m-69)/12)
 CH=[[48,55,60,64,67],[43,55,59,62,67],[45,57,60,64,69],[41,53,57,60,65]]  # C G Am F
-TB,TC,TD,TE=7.2,12,21.6,28.8
+TB,TC,TD,TE=(4.8,7.8,13.2,15.6) if SHORT else (7.2,12,21.6,28.8)
+TAIL=DUR-4; STEP,PUNCH=(.42,2.7) if SHORT else (.6,4.2)
 nb=int(np.ceil(DUR/BAR))
 for b in range(nb):
-    t0=b*BAR; ch=CH[b%4]; end=t0>=36
+    t0=b*BAR; ch=CH[b%4]; end=t0>=TAIL
     if end: ch=CH[0]
     # pad
     for m in ch[1:]:
         put(tone(note(m),BAR+1.2 if not end else 4.0,harm=(1,.35,.18,.08,.04),att=.5),t0,.045,pan=rng.uniform(-.4,.4))
-    if end and t0>36: continue
+    if end and t0>TAIL: continue
     sec='A' if t0<TB else 'B' if t0<TC else 'C' if t0<TD else 'D' if t0<TE else 'E'
     for k in range(8):                       # eighth notes
         t=t0+k*BEAT/2
@@ -37,8 +39,8 @@ for b in range(nb):
             elif sec=='B' and k%4==0: put(kick(.7),t,.4); put(tone(note(ch[0]-12),1.0,harm=(1,.3),dec=3),t,.22)
 # opening: one soft thud + note per problem block, then a bigger hit on the punchline
 for n in range(5):
-    t=.6+n*.6; put(kick(.8),t,.45); put(tone(note([60,62,64,67,69][n]),.9,dec=5),t,.16)
-put(kick(),4.2,.7); put(tone(note(36),2.0,harm=(1,.4),dec=1.5),4.2,.3); put(tone(note(72),1.5,dec=3),4.2,.16)
+    t=(.3 if SHORT else .6)+n*STEP; put(kick(.8),t,.45); put(tone(note([60,62,64,67,69][n]),.9,dec=5),t,.16)
+put(kick(),PUNCH,.7); put(tone(note(36),2.0,harm=(1,.4),dec=1.5),PUNCH,.3); put(tone(note(72),1.5,dec=3),PUNCH,.16)
 # risers into the cuts, impact on the end card
 def riser(d):
     t=np.arange(int(d*sr))/sr; n=rng.standard_normal(len(t)); n=np.diff(n,prepend=0); return n*(t/d)**3
@@ -48,7 +50,7 @@ put(kick(),TE,.8); put(tone(note(36),3.0,harm=(1,.4),dec=1.0),TE,.35)
 ir=rng.standard_normal(int(1.6*sr))*np.exp(-np.arange(int(1.6*sr))/sr*4.5)
 def rev(x): n=len(x)+len(ir); return np.fft.irfft(np.fft.rfft(x,n)*np.fft.rfft(ir,n),n)[:len(x)]*.012
 L2=L+rev(R)*.9; R2=R+rev(L)*.9
-t=np.arange(N)/sr; fade=np.minimum(1,t/.05)*np.clip((DUR-t)/3.5,0,1)
+t=np.arange(N)/sr; fade=np.minimum(1,t/.05)*np.clip((DUR-t)/(2.5 if SHORT else 3.5),0,1)
 st=np.stack([L2,R2],1)*fade[:,None]; st=np.tanh(st*1.6/np.abs(st).max()*1.2)*.89
 w=wave.open(sys.argv[1] if len(sys.argv)>1 else 'music.wav','wb'); w.setnchannels(2); w.setsampwidth(2); w.setframerate(sr)
 w.writeframes((st*32767).astype('<i2').tobytes()); w.close()

@@ -1,0 +1,183 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts.css">
+<style>
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#fbf3ea}
+canvas.full,.scene{position:absolute;left:0;top:0;width:1080px;height:1920px}
+.scene{overflow:hidden;visibility:hidden}
+.scene>*, .tile>*{position:absolute}
+.t{white-space:nowrap;color:#2a0e5c}
+.w{color:#fff}.coral{color:#f4583e}
+.kicker{font:400 64px 'Bebas Neue';letter-spacing:6px}
+.bar{height:8px;background:#f4583e}
+.line{font:400 150px Anton;text-transform:uppercase;line-height:1}
+.big{font:400 200px Anton;text-transform:uppercase;line-height:1}
+.num{font:400 250px Anton;line-height:1}
+.lab{font:400 46px 'Bebas Neue';letter-spacing:4px}
+.tag{font:600 50px Raleway}
+.he{font:700 52px Heebo;direction:rtl;line-height:1.3}
+.meta{font:400 56px 'Bebas Neue';letter-spacing:5px}
+.blk{width:860px;height:120px;font:400 80px Anton;line-height:120px;padding-left:34px;box-sizing:border-box;text-transform:uppercase;letter-spacing:1px}
+.cover{left:0;top:0;width:100%;height:100%;object-fit:cover}
+.tile{overflow:hidden;background:#ddd}
+.tile img,.tile canvas{left:0;top:0;width:100%;height:100%;object-fit:cover}
+.shadow{}
+.cap{font:400 108px Anton;text-transform:uppercase;line-height:1.12;color:#2a0e5c;white-space:nowrap}
+</style></head><body>
+<canvas id="bg" class="full" width="1080" height="1920"></canvas>
+<canvas id="cubes" class="full" width="1080" height="1920"></canvas>
+<div id="A" class="scene"></div><div id="B" class="scene"></div><div id="C" class="scene"></div>
+<div id="D" class="scene"></div><div id="E" class="scene" style="background:#faf5ed"></div>
+<canvas id="wipe" class="full" width="1080" height="1920"></canvas>
+<canvas id="grain" class="full" width="1080" height="1920"></canvas>
+<script>
+const W=1080,H=1920, TB=4.8, TC=7.8, TD=13.2, TE=15.6, END=20, SET=2.7;
+const clamp=x=>Math.min(1,Math.max(0,x)), ease=x=>1-Math.pow(1-clamp(x),3);
+const back=x=>{x=clamp(x);const c=1.70158;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+let seed=7; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const $=id=>document.getElementById(id);
+
+// ---------- light brand background + stacking cubes (opening) ----------
+const bg=$('bg').getContext('2d');
+function drawBg(t){
+  const g=bg.createLinearGradient(0,0,W,H); g.addColorStop(0,'#fdf6ee'); g.addColorStop(.55,'#eef0f8'); g.addColorStop(1,'#cfe2f3');
+  bg.fillStyle=g; bg.fillRect(0,0,W,H);
+  const sy=1300-ease(t/TB)*90, s=bg.createRadialGradient(760,sy,40,760,sy,360);
+  s.addColorStop(0,'rgba(255,214,170,.95)'); s.addColorStop(.8,'rgba(250,170,140,.5)'); s.addColorStop(1,'rgba(250,170,140,0)');
+  bg.fillStyle=s; bg.beginPath(); bg.arc(760,sy,360,0,7); bg.fill();
+}
+const PAL=[
+  {top:['#d8ebf8','#b5d6ee'],l:['#4f8fd2','#2f6db8'],r:['#27589f','#163a78']},
+  {top:['#ffd9c8','#f9b9a2'],l:['#f77a5e','#ee5438'],r:['#d8452f','#b33324']},
+  {top:['#fffaf2','#f8e6d6'],l:['#f3dccb','#e6c0ad'],r:['#dcb09e','#c79584']},
+  {top:['#8f9bd6','#6a78c2'],l:['#3a348c','#2a1f6c'],r:['#21154f','#150c38']},
+  {top:['#eaf4fb','#cfe4f3'],l:['#8dbbe2','#5f9ad0'],r:['#4a7fbd','#2d5c9c']}];
+const A_=96,B_=55,HH=110,OX=900,OY=1640, cubes=[];
+for(let i=0;i<=11;i++)for(let j=0;j<=11;j++){
+  if(i+j<3||i+j>13)continue;
+  const h=Math.min(6,Math.floor((i-j+4)*.85+rnd()*1.6)); if(h<=0)continue;
+  const p=PAL[Math.floor(rnd()*PAL.length)];
+  for(let k=0;k<h;k++)cubes.push({i,j,k,p:rnd()<.3?PAL[Math.floor(rnd()*PAL.length)]:p,o:k*3+rnd()*4+(11-i+j)*.25});
+}
+cubes.sort((a,b)=>a.o-b.o).forEach((c,n)=>c.t0=.2+n/cubes.length*8);
+const drawOrder=[...cubes].sort((a,b)=>(a.i+a.j)-(b.i+b.j)||a.k-b.k);
+const cx=$('cubes').getContext('2d');
+function face(pts,cols,y0,y1){const g=cx.createLinearGradient(0,y0,0,y1);g.addColorStop(0,cols[0]);g.addColorStop(1,cols[1]);
+  cx.fillStyle=g;cx.beginPath();pts.forEach((p,n)=>n?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.closePath();cx.fill();}
+function drawCubes(t){
+  cx.clearRect(0,0,W,H);
+  for(const c of drawOrder){
+    if(t<c.t0)continue;
+    const q=(t-c.t0)/.55, e=back(q), x=OX+(c.i-c.j)*A_, y=OY+(c.i+c.j)*B_-c.k*HH-(1-e)*520;
+    cx.globalAlpha=Math.min(1,q*3);
+    face([[x,y-HH],[x+A_,y-HH+B_],[x,y-HH+2*B_],[x-A_,y-HH+B_]],c.p.top,y-HH,y-HH+2*B_);
+    face([[x-A_,y-HH+B_],[x,y-HH+2*B_],[x,y+2*B_],[x-A_,y+B_]],c.p.l,y-HH+B_,y+2*B_);
+    face([[x+A_,y-HH+B_],[x,y-HH+2*B_],[x,y+2*B_],[x+A_,y+B_]],c.p.r,y-HH+B_,y+2*B_);
+  }
+  cx.globalAlpha=1;
+}
+{const g=$('grain').getContext('2d'),im=g.createImageData(W,H);
+ for(let n=0;n<im.data.length;n+=4){const v=rnd()*255;im.data[n]=im.data[n+1]=im.data[n+2]=v;im.data[n+3]=14}
+ g.putImageData(im,0,0);}
+
+// ---------- block wipe between scenes ----------
+const wp=$('wipe').getContext('2d'), WC=['#2a0e5c','#2f6db8','#f4583e','#b5d6ee','#f9b9a2','#163a78','#fbe9d8'], CUTS=[TB,TC,TD,TE], WD=.36;
+function drawWipe(t){
+  wp.clearRect(0,0,W,H);
+  for(const T of CUTS){const d=t-T; if(Math.abs(d)>=WD)continue;
+    const cover=d<0? (d+WD)/WD : 1-d/WD;
+    for(let r=0;r<9;r++)for(let c=0;c<5;c++){
+      const k=(c+(8-r))/12, delay=(d<0?k:1-k)*.45, s=ease((cover-delay)/.5); if(s<=0)continue;
+      const w=217*s,h=215*s; wp.fillStyle=WC[(c*3+r*5)%WC.length];
+      wp.fillRect(c*216+108-w/2, r*213.4+106.7-h/2+(1-s)*(d<0?-60:60), w, h);
+    }}
+}
+
+// ---------- generic animated elements ----------
+const els=[], imgs=[];
+function add(scene,cls,html,left,top,tin,tout,opt={}){const d=document.createElement('div');d.className=cls;d.innerHTML=html;
+  d.style.left=left+'px';d.style.top=top+'px';$(scene).appendChild(d);els.push({d,tin,tout,opt});return d;}
+function img(parent,src,cls='cover'){const i=new Image();i.src=src;i.className=cls;parent.appendChild(i);imgs.push(i);return i;}
+const zooms=[];
+function kenburns(el,t0,t1,from,to,origin='50% 50%'){el.style.transformOrigin=origin;zooms.push({el,t0,t1,from,to});}
+
+// A — the problems, stacked like blocks
+add('A','t kicker','The problems that matter most',90,200,.1,TB);
+add('A','bar','',90,278,.25,TB,{bar:150});
+[['Pandemics','#2a0e5c','#fff'],['Unsafe AI','#2f6db8','#fff'],['Climate breakdown','#f4583e','#fff'],
+ ['Extreme poverty','#b5d6ee','#2a0e5c'],['Factory farming','#f9b9a2','#2a0e5c']].forEach(([txt,b,c],n)=>{
+  const d=add('A','blk',txt,90,880-n*134,.3+n*.42,TB,{drop:260});d.style.background=b;d.style.color=c;});
+add('A','t line','won’t solve',90,1070,2.7,TB,{drop:140});
+add('A','t line','themselves.',90,1230,2.95,TB,{drop:140});
+add('A','t tag','Someone has to <b style="color:#f4583e">build</b> the solutions.',94,1420,3.5,TB).style.fontSize='46px';
+
+// B — last year, in numbers
+{const i=img($('B'),'assets/photos/012.jpg');i.style.objectPosition='62% 50%';kenburns(i,TB-.5,TC+.5,1.02,1.12,'60% 40%');}
+add('B','','',0,0,0,99).style.cssText='left:0;top:0;width:100%;height:100%;background:linear-gradient(180deg,rgba(26,10,70,.25) 0%,rgba(26,10,70,.6) 40%,rgba(26,10,70,.95) 78%)';
+add('B','t w kicker','Last year',90,1090,TB+.1,99);
+add('B','bar','',90,1168,TB+.25,99,{bar:150});
+const n1=add('B','t w num','0',90,1210,TB+.35,99,{drop:140}), n2=add('B','t num coral','0',560,1210,TB+.75,99,{drop:140});
+add('B','t w lab','participants',94,1475,TB+.5,99); add('B','t w lab','partner organizations',564,1475,TB+.9,99);
+add('B','t w tag','One day. A lot of ambition.',94,1600,TB+1.5,99);
+const counts=[[n1,220,TB+.35],[n2,23,TB+.75]];
+
+// C — photo + video tiles that stack in like blocks
+const clips=[], sets=[
+ {v:'0717',n:96,p1:'008',cap:['Organizations','doing the work.'],mirror:0},
+ {v:'0721',n:81,p1:'033',cap:['People ready','to start.'],mirror:1}];
+function tile(x,y,w,h,col,tin,tout,order){
+  const sh=add('C','shadow','',x+18,y+18,tin+order*.12,tout,{drop:240,out:1});sh.style.cssText+=`width:${w}px;height:${h}px;background:${col}`;
+  const d=add('C','tile','',x,y,tin+order*.12,tout,{drop:240,out:1});d.style.width=w+'px';d.style.height=h+'px';return d;}
+sets.forEach((s,k)=>{
+  const t0=TC+k*SET, t1=t0+SET-(k<1?.22:0), m=s.mirror;
+  const v=tile(m?350:90,140,640,1138,'#f4583e',t0,t1,0), cv=document.createElement('canvas');cv.width=640;cv.height=1138;v.appendChild(cv);
+  const frames=[];for(let f=1;f<=s.n;f++){const i=new Image();i.src=`assets/clips/${s.v}/${String(f).padStart(3,'0')}.jpg`;frames.push(i);imgs.push(i);}
+  clips.push({ctx:cv.getContext('2d'),frames,t0});
+  kenburns(img(tile(m?70:400,1010,610,407,'#2f6db8',t0,t1,1),`assets/photos/${s.p1}.jpg`),t0,t0+SET,1.0,1.07);
+  add('C','cap',`${s.cap[0]}<br><span class="coral">${s.cap[1]}</span>`,90,1510,t0+.4,t1,{out:1});
+});
+
+// D — this year's question
+{const i=img($('D'),'assets/photos/191.jpg');kenburns(i,TD-.5,TE+.5,1.02,1.1);}
+add('D','','',0,0,0,99).style.cssText='left:0;top:0;width:100%;height:100%;background:rgba(26,10,70,.82)';
+add('D','t w kicker','This year',90,640,TD+.1,99);
+add('D','bar','',90,718,TD+.25,99,{bar:150});
+add('D','t w line','What’s needed',90,770,TD+.35,99,{drop:140});
+add('D','t w line','most?',90,930,TD+.5,99,{drop:140});
+add('D','t line coral','Who will build it?',90,1110,TD+1.15,99,{drop:140}).style.fontSize='116px';
+
+// E — end card with the brand artwork
+const artBox=add('E','','',0,1060,0,99);artBox.style.cssText+='width:1080px;height:860px;overflow:hidden';
+{const i=img(artBox,'assets/art.jpg');i.style.objectPosition='50% 62%';kenburns(i,TE-.5,END,1.14,1.0,'60% 55%');}
+add('E','','',0,1060,0,99).style.cssText='left:0;top:1060px;width:1080px;height:240px;background:linear-gradient(180deg,#faf5ed 0,rgba(250,245,237,0) 100%)';
+const logo=add('E','','',84,110,TE+.2,99);logo.style.cssText+='width:476px;height:140px';img(logo,'assets/logo.png');
+add('E','t kicker','IMPACT SUMMIT 2027',90,320,TE+.4,99);
+add('E','bar','',90,398,TE+.55,99,{bar:150});
+add('E','t big','<i>What we</i>',90,430,TE+.65,99);
+add('E','t big coral','<i>Build</i>',90,630,TE+1.0,99,{drop:160});
+add('E','t he','מאתרים את הדרכים היעילות ביותר<br>לשפר את העולם',90,850,TE+1.6,99).style.textAlign='left';
+add('E','t meta','Friday · 29.01.2027 | Tel-Aviv',90,1000,TE+2.1,99);
+
+function drawEls(t){
+  for(const {d,tin,tout,opt} of els){
+    const a=ease((t-tin)/.5), o=1-ease((t-tout)/.22);
+    d.style.opacity=t<tin?0:Math.min(a*1.4,1)*o;
+    if(opt.bar!==undefined){d.style.width=opt.bar*a+'px';continue;}
+    const y=opt.drop?(1-back((t-tin)/.5))*-opt.drop:(1-a)*40;
+    d.style.transform=`translateY(${y+(opt.out?(1-o)*120:0)}px)`;
+  }
+  for(const z of zooms){const s=z.from+(z.to-z.from)*clamp((t-z.t0)/(z.t1-z.t0));z.el.style.transform=`scale(${s})`;}
+  for(const [el,n,t0] of counts)el.textContent=Math.round(n*ease((t-t0)/.8));
+  for(const c of clips){const f=c.frames[Math.max(0,Math.min(c.frames.length-1,Math.floor((t-c.t0)*30)))];
+    if(t>=c.t0-.1&&t<c.t0+SET+.1&&f.naturalWidth){const h=640*f.naturalHeight/f.naturalWidth;c.ctx.drawImage(f,0,(1138-h)/2,640,h);}}
+}
+window.renderAt=t=>{
+  const sc=t<TB?'A':t<TC?'B':t<TD?'C':t<TE?'D':'E';
+  for(const id of 'ABCDE')$(id).style.visibility=id===sc?'visible':'hidden';
+  $('cubes').style.visibility=sc==='A'?'visible':'hidden';
+  if(sc==='A'||sc==='C'){drawBg(t);} if(sc==='A')drawCubes(t);
+  drawEls(t);drawWipe(t);
+};
+Promise.all([document.fonts.ready,...imgs.map(i=>i.decode().catch(e=>console.log('img fail',i.src)))]).then(()=>{
+  window.renderAt(+(new URLSearchParams(location.search).get('t')||0));window.READY=true;});
+</script></body></html>
