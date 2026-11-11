@@ -117,9 +117,8 @@ p+p{margin-top:.9em}
 .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:clamp(18px,2.6vw,28px);margin-bottom:1.4em}
 .people:empty,.orgs:empty{display:none}
 .canva{position:relative;width:100%;max-width:620px;background:#fff;box-shadow:-8px 8px 0 var(--blue);margin-bottom:1.6em}
-.canva.wide{max-width:none}
 .canva iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.canva{margin-bottom:0}
+.canva:not(:last-child){margin-bottom:0}
 .hint{position:absolute;inset-inline:0;bottom:14px;margin:auto;width:fit-content;display:flex;align-items:center;gap:.5em;pointer-events:none;
   background:var(--coral);color:#fff;font-weight:900;font-size:clamp(15px,1.6vw,18px);padding:.45em .9em;box-shadow:-5px 5px 0 var(--navy);
   animation:nudge 1.3s ease-in-out infinite;transition:opacity .5s}
@@ -292,33 +291,45 @@ var SPEAKERS = [
 
 /* OPTION 2 — show the speakers straight from a Canva design, so you only ever edit Canva.
    In Canva: Share > Embed > copy the "smart embed link" (it ends with /view?embed) and paste it as url.
-   Never paste the normal sharing/edit link here. width/height = the Canva page proportions (any units). */
-var CANVA_SPEAKERS = { url: 'https://www.canva.com/design/DAHWrUeaBRI/TJenzxgltaJ_n6PEGXau-A/view?embed', width: 421, height: 474 };
+   Never paste the normal sharing/edit link here.
+
+   FRAME SIZE — the frame is made as tall as the Canva content, so nobody has to scroll inside it.
+   The page cannot read the size from Canva, so it works it out from "rows":
+     rows      = how many rows of cards the Canva design has now.  CHANGE THIS when you add or remove a row.
+     width     = width of the Canva page, rowHeight = height of one row (same units; only the proportion matters).
+     maxWidth  = widest the frame may get on a big screen, in pixels.
+     scrollHint = true shows a "scroll for more" badge and note (only useful if you keep the frame shorter than the content). */
+var CANVA_SPEAKERS = { url: 'https://www.canva.com/design/DAHWrUeaBRI/TJenzxgltaJ_n6PEGXau-A/view?embed',
+                       rows: 3, width: 421, rowHeight: 237, maxWidth: 620, scrollHint: false };
 var ORGS = [
 ];
 
-/* OPTION 2 for the organizations — a logo gallery straight from a Canva design, same idea as the speakers.
-   Paste the Canva "smart embed link" (ends with /view?embed) as url. A design with several pages shows as a
-   gallery with arrows. width/height = the Canva page proportions. Leave url as '' to use the ORGS list instead. */
-var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvUggKQIjAQ/view?embed', width: 421, height: 474 };
+/* OPTION 2 for the organizations — the logos straight from a Canva design. Same settings as the speakers above:
+   change "rows" whenever the Canva design gets taller or shorter. Leave url as '' to use the ORGS list instead. */
+var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvUggKQIjAQ/view?embed',
+                   rows: 2, width: 421, rowHeight: 237, maxWidth: 620, scrollHint: false };
 
 (function(){
   /* ---- build the speaker and organization cards from the lists above ---- */
   function el(tag,cls,txt){ var e=document.createElement(tag); e.className=cls; if(txt) e.textContent=txt; return e; }
-  function canva(cfg,hostId,title,wide){            /* returns true when a valid Canva embed link was set */
+  function canva(cfg,hostId,title){            /* returns true when a valid Canva embed link was set */
     var cu = ((cfg&&cfg.url)||'').trim();
     if (!/^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view(\?|$)/.test(cu)) return false;
-    var box = el('div','canva rv'+(wide?' wide':'')), fr = document.createElement('iframe');
-    box.style.aspectRatio = cfg.width + ' / ' + cfg.height;
+    var box = el('div','canva rv'), fr = document.createElement('iframe'),
+        h = cfg.rowHeight ? cfg.rowHeight*Math.max(1,+cfg.rows||1) : cfg.height;      /* frame as tall as the content */
+    box.style.aspectRatio = cfg.width + ' / ' + h; if (cfg.maxWidth) box.style.maxWidth = cfg.maxWidth + 'px';
     fr.src = cu.indexOf('embed')>-1 ? cu : cu + (cu.indexOf('?')>-1?'&':'?') + 'embed';
     fr.loading = 'lazy'; fr.title = title; fr.setAttribute('allow','fullscreen'); fr.setAttribute('allowfullscreen','');
     box.appendChild(fr);
-    /* the frame scrolls inside: a bouncing "scroll" badge on it (fades once the visitor reaches the frame) and a note under it */
-    var hint = el('div','hint'); hint.appendChild(el('span','','גללו לעוד')); hint.appendChild(document.createElement('i')); box.appendChild(hint);
-    function off(){ setTimeout(function(){ hint.classList.add('off'); },1800); }
-    box.addEventListener('mouseenter',off); window.addEventListener('blur',function(){ if(document.activeElement===fr) off(); });
-    var cap = el('p','cap rv'); cap.appendChild(document.createElement('i')); cap.appendChild(el('span','','יש עוד בפנים: גללו בתוך המסגרת כדי לראות את כולם'));
-    var host = document.getElementById(hostId); host.className = ''; host.appendChild(box); host.appendChild(cap); return true;
+    var cap = null;
+    if (cfg.scrollHint){   /* optional: a bouncing "scroll" badge on the frame (fades once the visitor reaches it) and a note under it */
+      var hint = el('div','hint'); hint.appendChild(el('span','','גללו לעוד')); hint.appendChild(document.createElement('i')); box.appendChild(hint);
+      var off = function(){ setTimeout(function(){ hint.classList.add('off'); },1800); };
+      box.addEventListener('mouseenter',off); window.addEventListener('blur',function(){ if(document.activeElement===fr) off(); });
+      cap = el('p','cap rv'); cap.appendChild(document.createElement('i')); cap.appendChild(el('span','','יש עוד בפנים: גללו בתוך המסגרת כדי לראות את כולם'));
+      cap.style.maxWidth = box.style.maxWidth;
+    }
+    var host = document.getElementById(hostId); host.className = ''; host.appendChild(box); if (cap) host.appendChild(cap); return true;
   }
   if (canva(CANVA_SPEAKERS,'speakers','דוברים ודוברות')) SPEAKERS = [];
   if (canva(typeof CANVA_ORGS==='undefined'?null:CANVA_ORGS,'orgs','הארגונים שתפגשו בכנס')) ORGS = [];
