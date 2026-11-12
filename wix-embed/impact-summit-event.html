@@ -319,6 +319,7 @@ var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvU
   /* ---- build the speaker and organization cards from the lists above ---- */
   function el(tag,cls,txt){ var e=document.createElement(tag); e.className=cls; if(txt) e.textContent=txt; return e; }
   function canva(cfg,hostId,title){            /* returns true when a valid Canva embed link was set */
+    if (!document.getElementById(hostId)) return false;
     var cu = ((cfg&&cfg.url)||'').trim();
     if (!/^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view(\?|$)/.test(cu)) return false;
     var box = el('div','canva rv'+(cfg.hideControls&&!cfg.scrollHint?' crop':'')), fr = document.createElement('iframe'),
@@ -336,14 +337,14 @@ var CANVA_ORGS = { url: 'https://www.canva.com/design/DAHaoovwHOo/doKTYdG09eANvU
   }
   if (canva(CANVA_SPEAKERS,'speakers','דוברים ודוברות')) SPEAKERS = [];
   if (canva(typeof CANVA_ORGS==='undefined'?null:CANVA_ORGS,'orgs','הארגונים שתפגשו בכנס')) ORGS = [];
-  SPEAKERS.forEach(function(sp,n){
+  if (document.getElementById('speakers')) SPEAKERS.forEach(function(sp,n){
     var c=el('div','person rv'), ph=el('div','ph'); c.style.setProperty('--i',n%4);
     if(sp.photo){ ph.style.backgroundImage='url("'+encodeURI(sp.photo)+'")'; ph.setAttribute('role','img'); ph.setAttribute('aria-label',sp.name||''); }
     else ph.textContent=(sp.name||'').trim().charAt(0);
     c.appendChild(ph); c.appendChild(el('div','nm',sp.name)); if(sp.role) c.appendChild(el('div','rl',sp.role));
     document.getElementById('speakers').appendChild(c);
   });
-  ORGS.forEach(function(o,n){
+  if (document.getElementById('orgs')) ORGS.forEach(function(o,n){
     var c=el(o.url?'a':'div','org rv'); c.style.setProperty('--i',n%6);
     if(o.url){ c.href=o.url; c.target='_blank'; c.rel='noopener'; }
     if(o.logo){ var im=new Image(); im.src=o.logo; im.alt=o.name||''; c.appendChild(im); } else c.textContent=o.name||'';
