@@ -112,7 +112,7 @@ p+p{margin-top:.9em}
 
 /* "updating weekly" */
 .soon{display:inline-flex;align-items:center;gap:.6em;background:#fff;padding:.5em 1em;font-weight:700}
-.dot{width:.8em;height:.8em;border-radius:50%;background:var(--coral);animation:pulse 1.6s ease-in-out infinite}
+.dot{flex:none;width:.8em;height:.8em;border-radius:50%;background:var(--coral);animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,88,62,.55)}60%{box-shadow:0 0 0 .7em rgba(244,88,62,0)}}
 .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:clamp(18px,2.6vw,28px);margin-bottom:1.4em}
 .people:empty,.orgs:empty{display:none}
@@ -251,6 +251,7 @@ p+p{margin-top:.9em}
       <li class="rv" style="--i:2">לבנות קריירה עם אימפקט משמעותי</li>
       <li class="rv" style="--i:3">לתרום לעמותות האפקטיביות ביותר</li>
     </ul>
+    <div class="soon rv" style="margin-top:1.6em"><span class="dot"></span>רשימת הדוברים והדוברות והארגונים השותפים תתעדכן כאן בקרוב</div>
   </div>
 </section>
 
